@@ -2,13 +2,13 @@
 import re, requests, whois
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
+import os, sys
 
 
 def query_iq(filters):
     url = "https://iqwhois.com/advanced-search"
 
     payload = {
-        '_token': '65jmzKmOk5Mp9vrd88NT9RkhbICROo2xd8Atjbml',
         'expiration': 0,
         'registered': 0,
         'updated': 0
@@ -38,8 +38,8 @@ def query_iq(filters):
 
 
 def validate_filter(filters):
-    valid_sections = ["Admin", "Registrant", "Technical", "Billing"]
-    valid_fields = ["Name", "Organization", "Email", "Street", "City", "State", "PostalCode", "Fax", "Country", "Telephone"]
+    valid_sections = ["admin", "registrant", "technical", "billing"]
+    valid_fields = ["name", "organization", "email", "street", "city", "state", "postalcode", "fax", "country", "telephone"]
 
     
     match = re.match(r'^([a-zA-Z]+):([a-zA-Z]+)=(.+)$', filters)
@@ -48,23 +48,25 @@ def validate_filter(filters):
 
     section, field, value = match.groups()
 
-    if section not in valid_sections:
+    if section.lower() not in valid_sections:
         raise ValueError(f"Invalid section in filter: {section}. Valid sections are {', '.join(valid_sections)}.")
 
-    if field not in valid_fields:
+    if field.lower() not in valid_fields:
         raise ValueError(f"Invalid field in filter: {field}. Valid fields are {', '.join(valid_fields)}.")
 
     return True
+ 
 
-
-def enrich_data(domains):
+def enrich_data(domains, display_active):
     results = [["Domain", "Creation Date", "Expiration Date", "Registrar", "Name Servers"]]
-
+    original_out = sys.stdout
 
     for domain in domains:
         try:
+            #WHOIS prints information to the console in some cases. This forces it to output that to NULL for a cleaner console.
+            sys.stdout = open(os.devnull, 'w')
             info = whois.whois(domain)
-
+        
             try:
                 creation_date_str = format_datetime(info.creation_date)  
             except:
@@ -81,9 +83,9 @@ def enrich_data(domains):
                 info.registrar,
                 info.name_servers
             ]
-
-            results.append(enriched_data)
-        except Exception as e:
+            if "-" in creation_date_str:
+                results.append(enriched_data)
+        except:
             enriched_data = [
                 domain,
                 "",
@@ -91,7 +93,10 @@ def enrich_data(domains):
                 "",
                 "" 
             ]
-            results.append(enriched_data)
+            if not display_active:
+                results.append(enriched_data)
+            pass
+    sys.stdout = original_out
     return results
 
 

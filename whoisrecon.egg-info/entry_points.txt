@@ -1,0 +1,2 @@
+[console_scripts]
+whoisrecon = whoisrecon.whoisrecon:main

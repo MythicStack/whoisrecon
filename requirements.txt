@@ -1,0 +1,6 @@
+setuptools
+argparse
+tabulate
+requests
+whois
+bs4

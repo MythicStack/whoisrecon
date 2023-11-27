@@ -1,23 +1,29 @@
+#!/usr/bin/env python
 import argparse, tabulate
-from utils import query_iq, validate_filter, enrich_data
+from whoisrecon.utils import query_iq, validate_filter, enrich_data
 
-# Example Usage: whoisrecon --filter 
 
 def parse_argument():
     parser = argparse.ArgumentParser(
         description="WHOIS Reconnaissance Tool",
-        epilog="Example: python whoisrecon.py --filter \"Admin:Name=John Doe\" --filter \"Admin:Email=*@example.com\"")
+        epilog="Example: whoisrecon --filter \"Admin:Name=* Doe\"")
 
-    parser.add_argument("-e", "--enrich", action="store_true",
-                        help="Enrich the data with additional WHOIS information. May increase the run time of the program significantly with larger datasets.")
+    parser.add_argument("--active", "-a", action="store_true",
+                        help="Display only active WHOIS information. This also filters out domains unsupported by the queried WHOIS registry.")
+
+    parser.add_argument("--count", "-c", action="store_true",
+                        help="Return a count of the items found from the filter.")
+
+    parser.add_argument("--enrich", "-e", action="store_true",
+                        help="Enrich the data with additional WHOIS information. May increase the run time of the program significantly with larger datasets. Perform a --count first.")
 
     parser.add_argument("--filter", action="store",
                         help="Specify a filter for WHOIS query (e.g., 'Admin:Name=John Doe'). "
-                             "Accepted options for sections: Admin, Registrant, Technical, Billing. "
-                             "Accepted options for fields: Name, Organization, Email, Street, City, "
+                             "Accepted options for 'sections': Admin, Registrant, Technical, Billing. "
+                             "Accepted options for 'fields': Name, Organization, Email, Street, City, "
                              "State, PostalCode, Fax, Country, Telephone. You cannot use multiple filters in the same query.")
         
-    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0", help="Prints the current version information.")
+    parser.add_argument("--version", "-v", action="version", version="%(prog)s 1.0", help="Prints the current version information.")
 
     return parser.parse_args()
 
@@ -27,18 +33,28 @@ def main():
         args = parse_argument()
         filters = args.filter
 
+        if args.count and (args.active or args.enrich or args.active):
+            raise ValueError("The --count option cannot be enabled with other options.")
+
+        if args.active and not args.enrich:
+            raise ValueError("The --active option must be used with the --enrich option.")
+
         if not filters:
             raise ValueError("At least one filter must be specified. Use --filter option.")
         
         if validate_filter(filters):
             results = query_iq(filters)
         
+        if args.count:
+            print(len(results))
+            return
+
         if len(results) <= 0:
             print("No Results Found...")
             return
 
         if args.enrich:
-            results = enrich_data(results)
+            results = enrich_data(results, args.active)
             table = tabulate.tabulate(results,headers='firstrow')
             print(table)           
         else:

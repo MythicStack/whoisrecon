@@ -1,3 +1,27 @@
+Metadata-Version: 2.1
+Name: whoisrecon
+Version: 0.1.0
+Summary: WHOIS Reconnaissance Tool
+Home-page: https://www.github.com/MythicStack/whoisrecon
+Author: John Christian (MythicStack)
+Maintainer: John Christian (MythicStack)
+Maintainer-email: mythicstack@pm.me
+License: Apache License 2.0
+Platform: Unix
+Platform: Windows
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache License 2.0
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: setuptools
+Requires-Dist: argparse
+Requires-Dist: tabulate
+Requires-Dist: requests
+Requires-Dist: whois
+Requires-Dist: bs4
+
 # whoisrecon
 
 whoisrecon is a Python command-line tool designed for WHOIS reconnaissance, providing a streamlined way to find related domains from current and historical records (updated quarterly) based on search parameters.
