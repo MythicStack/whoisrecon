@@ -1,5 +1,3 @@
-
-
 # whoisrecon
 
 whoisrecon is a Python command-line tool designed for WHOIS reconnaissance, providing a streamlined way to find related domains from current and historical records (updated quarterly) based on search parameters.
