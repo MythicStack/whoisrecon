@@ -15,6 +15,26 @@ whoisrecon is a Python command-line tool designed for WHOIS reconnaissance, prov
 - **Historical Data**: Searches as historical database that is updated quarterly.
 
 
+## Filtering Options
+
+#### Sections
+ - - Admin
+ - - Registrant
+ - - Technical
+ - - Billing
+ 
+#### Fields
+ - - Name
+ - - Organization
+ - - Email
+ - - Street
+ - - City
+ - - State
+ - - PostalCode
+ - - Fax
+ - - Country
+
+
 # Installation
 
 ```bash
